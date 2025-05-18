@@ -27,6 +27,11 @@ public class UserController {
         return userService.createUserAdminLogistic(userMapper.toModel(userRequest), userRequest.getRole()).then();
     }
 
-
+    @PostMapping("/client")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create new client user")
+    public Mono<Void> createUserClient(@Valid @RequestBody UserRequest userRequest) {
+        return userService.createUserClient(userMapper.toModel(userRequest)).then();
+    }
 
 }

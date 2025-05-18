@@ -6,6 +6,6 @@ import reactor.core.publisher.Mono;
 public interface IUserServicePort {
     Mono<UserModel> createUserAdminLogistic(UserModel userModel, String role);
 
-
+    Mono<UserModel> createUserClient(UserModel userModel);
 
 }
