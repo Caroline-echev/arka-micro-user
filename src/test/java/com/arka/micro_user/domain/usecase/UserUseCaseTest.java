@@ -140,5 +140,23 @@ class UserUseCaseTest {
 
         verify(rolePersistencePort).getRoleByName(UserRole.CLIENT.name());
     }
+    @Test
+    void changeUserPassword_Success() {
+        UserModel user = UserData.getAdminUser();
+        String email = user.getEmail();
+        String oldPassword = "old-password";
+        String newPassword = "new-password";
+        String encodedNewPassword = "encoded-new-password";
+
+        when(userPersistencePort.findByEmail(email)).thenReturn(Mono.just(user));
+        when(passwordEncoderPersistencePort.matches(oldPassword, user.getPassword())).thenReturn(true);
+        when(passwordEncoderPersistencePort.encodePassword(newPassword)).thenReturn(Mono.just(encodedNewPassword));
+        when(userPersistencePort.saveUser(any(UserModel.class))).thenReturn(Mono.just(user));
+
+        StepVerifier.create(userUseCase.changeUserPassword(email, oldPassword, newPassword))
+                .verifyComplete();
+
+        verify(userPersistencePort).saveUser(any(UserModel.class));
+    }
 
 }

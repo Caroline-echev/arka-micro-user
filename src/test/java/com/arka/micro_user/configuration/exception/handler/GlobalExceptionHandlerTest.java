@@ -2,6 +2,7 @@ package com.arka.micro_user.configuration.exception.handler;
 
 import com.arka.micro_user.domain.exception.BusinessException;
 import com.arka.micro_user.domain.exception.error.CommonErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,4 +124,6 @@ class GlobalExceptionHandlerTest {
         assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(exchange.getResponse().getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
     }
+
+
 }
