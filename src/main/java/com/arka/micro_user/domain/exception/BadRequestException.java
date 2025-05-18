@@ -17,15 +17,5 @@ public class BadRequestException extends BusinessException {
         super(DEFAULT_ERROR_CODE, message);
     }
 
-    public BadRequestException(ErrorCode errorCode) {
-        super(errorCode);
-    }
 
-    public BadRequestException(ErrorCode errorCode, String message) {
-        super(errorCode, message);
-    }
-
-    public BadRequestException(String code, String message) {
-        super(code, message, STATUS_CODE);
-    }
 }

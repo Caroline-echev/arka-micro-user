@@ -1,12 +1,7 @@
 package com.arka.micro_user.domain.usecase;
 
 import com.arka.micro_user.domain.api.IUserServicePort;
-import com.arka.micro_user.domain.enums.UserRole;
 import com.arka.micro_user.domain.enums.UserStatus;
-import com.arka.micro_user.domain.exception.BadRequestException;
-import com.arka.micro_user.domain.exception.DuplicateResourceException;
-import com.arka.micro_user.domain.exception.NotFoundException;
-import com.arka.micro_user.domain.model.RoleModel;
 import com.arka.micro_user.domain.model.UserModel;
 import com.arka.micro_user.domain.spi.IPasswordEncoderPersistencePort;
 import com.arka.micro_user.domain.spi.IRolePersistencePort;
@@ -17,8 +12,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-
-import static com.arka.micro_user.domain.util.UserConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +30,7 @@ public class UserUseCase implements IUserServicePort {
                             .then(UserValidationUtil.validateUserDoesNotExistByDni(userModel.getDni(), userPersistencePort))
                             .then(Mono.defer(() -> {
                                 userModel.setStatus(UserStatus.ACTIVE.name());
-                                userModel.setCreated_at(LocalDateTime.now());
+                                userModel.setCreatedAt(LocalDateTime.now());
                                 return Mono.just(userModel);
                             }))
                             .flatMap(this::encodePassword)

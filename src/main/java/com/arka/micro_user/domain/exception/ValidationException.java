@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.http.HttpStatus;
 
-/**
- * Exception for validation errors in input data
- */
 @AllArgsConstructor
 @Builder
 public class ValidationException extends BusinessException {
@@ -20,15 +17,5 @@ public class ValidationException extends BusinessException {
         super(DEFAULT_ERROR_CODE, message);
     }
 
-    public ValidationException(ErrorCode errorCode) {
-        super(errorCode);
-    }
 
-    public ValidationException(ErrorCode errorCode, String message) {
-        super(errorCode, message);
-    }
-
-    public ValidationException(String code, String message) {
-        super(code, message, STATUS_CODE);
-    }
 }

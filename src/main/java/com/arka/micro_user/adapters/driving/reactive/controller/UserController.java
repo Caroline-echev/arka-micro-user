@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-@RestController
+@RestControllergit
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Tag(name = "User Controller", description = "Endpoints para gestión de usuarios")

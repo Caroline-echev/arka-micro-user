@@ -6,9 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.http.HttpStatus;
 
-/**
- * Exception for when a resource is not found
- */
+
 @AllArgsConstructor
 @Builder
 public class NotFoundException extends BusinessException {
@@ -20,15 +18,4 @@ public class NotFoundException extends BusinessException {
         super(DEFAULT_ERROR_CODE, message);
     }
 
-    public NotFoundException(ErrorCode errorCode) {
-        super(errorCode);
-    }
-
-    public NotFoundException(ErrorCode errorCode, String message) {
-        super(errorCode, message);
-    }
-
-    public NotFoundException(String code, String message) {
-        super(code, message, STATUS_CODE);
-    }
 }

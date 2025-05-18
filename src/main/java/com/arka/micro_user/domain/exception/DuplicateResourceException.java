@@ -18,15 +18,4 @@ public class DuplicateResourceException extends BusinessException {
         super(DEFAULT_ERROR_CODE, message);
     }
 
-    public DuplicateResourceException(ErrorCode errorCode) {
-        super(errorCode);
-    }
-
-    public DuplicateResourceException(ErrorCode errorCode, String message) {
-        super(errorCode, message);
-    }
-
-    public DuplicateResourceException(String code, String message) {
-        super(code, message, STATUS_CODE);
-    }
 }
