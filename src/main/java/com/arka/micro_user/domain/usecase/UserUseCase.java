@@ -3,6 +3,7 @@ package com.arka.micro_user.domain.usecase;
 import com.arka.micro_user.domain.api.IUserServicePort;
 import com.arka.micro_user.domain.enums.UserRole;
 import com.arka.micro_user.domain.enums.UserStatus;
+import com.arka.micro_user.domain.exception.BadRequestException;
 import com.arka.micro_user.domain.exception.NotFoundException;
 import com.arka.micro_user.domain.model.UserModel;
 import com.arka.micro_user.domain.spi.IPasswordEncoderPersistencePort;
@@ -15,7 +16,8 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
-import static com.arka.micro_user.adapters.util.UserConstantsAdapter.ROLE_CLIENT_NOT_FOUND;
+import static com.arka.micro_user.domain.util.UserConstants.*;
+
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,7 @@ public class UserUseCase implements IUserServicePort {
 
     @Override
     public Mono<UserModel> createUserClient(UserModel userModel) {
-        return rolePersistencePort.getRoleByName(UserRole.CLIENT.name()).switchIfEmpty(Mono.error(new NotFoundException(ROLE_CLIENT_NOT_FOUND)))
+        return rolePersistencePort.getRoleByName(UserRole.CLIENT.name()).switchIfEmpty(Mono.error(new NotFoundException(ROLE_DOES_NOT_EXIST_EXCEPTION_MESSAGE)))
                 .flatMap(roleModel -> {
                     userModel.setRoleId(roleModel.getId());
                     return UserValidationUtil.validateUserDoesNotExistByEmail(userModel.getEmail(), userPersistencePort)
@@ -58,6 +60,24 @@ public class UserUseCase implements IUserServicePort {
                             .flatMap(userPersistencePort::saveUser);
                 });
     }
+
+    @Override
+    public Mono<Void> changeUserPassword(String email, String oldPassword, String newPassword) {
+        return userPersistencePort.findByEmail(email)
+                .switchIfEmpty(Mono.error(new NotFoundException(USER_DOES_NOT_EXIST_EXCEPTION_MESSAGE + email)))
+                .flatMap(user -> {
+                    boolean matches = passwordEncoderPersistencePort.matches(oldPassword, user.getPassword());
+                    if (!matches) {
+                        return Mono.error(new BadRequestException(INVALID_PASSWORD_EXCEPTION_MESSAGE));
+                    }
+                    return passwordEncoderPersistencePort.encodePassword(newPassword)
+                            .flatMap(encoded -> {
+                                user.setPassword(encoded);
+                                return userPersistencePort.saveUser(user).then();
+                            });
+                });
+    }
+
 
     private Mono<UserModel> encodePassword(UserModel userModel) {
         return passwordEncoderPersistencePort.encodePassword(userModel.getPassword())

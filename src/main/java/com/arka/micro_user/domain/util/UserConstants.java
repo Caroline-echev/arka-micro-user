@@ -5,10 +5,15 @@ public class UserConstants {
     private UserConstants() {
         throw new IllegalStateException("Utility class");
     }
+
     public static final String ROLE_DOES_NOT_EXIST_EXCEPTION_MESSAGE = "Role does not exist";
     public static final String USER_ALREADY_EXISTS_BY_EMAIL_EXCEPTION_MESSAGE = "User already exists by email: ";
-      public static final String USER_ALREADY_EXISTS_BY_DNI_EXCEPTION_MESSAGE = "User already exists by dni: ";
+    public static final String USER_DOES_NOT_EXIST_EXCEPTION_MESSAGE = "User does not exist";
+    public static final String USER_ALREADY_EXISTS_BY_DNI_EXCEPTION_MESSAGE = "User already exists by dni: ";
     public static final String INVALID_ROLE_EXCEPTION_MESSAGE =  "Invalid role name";
+    public static final String INVALID_PASSWORD_EXCEPTION_MESSAGE = "The old password is invalid";
+
+
 
     public static final String DNI_REQUIRED = "DNI is required";
     public static final String DNI_NUMERIC = "DNI must be numeric";

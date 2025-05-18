@@ -17,7 +17,8 @@ public class UserConstantsAdapter {
     public static final String PASSWORD_REQUIRED = "Password is required";
     public static final String PHONE_REQUIRED = "Phone number is required";
     public static final String PHONE_FORMAT = "Phone number must start with '+' and include country code (max 16 characters)";
-    public static final String ROLE_CLIENT_NOT_FOUND = "Role Client not found";
+    public static final String NEW_PASSWORD_REQUIRED = "New password is required";
+    public static final String OLD_PASSWORD_REQUIRED = "Old password is required";
     public static final String REGEX_NUMERIC = "\\d+";
     public static final String REGEX_PHONE = "\\+\\d{1,15}";
 

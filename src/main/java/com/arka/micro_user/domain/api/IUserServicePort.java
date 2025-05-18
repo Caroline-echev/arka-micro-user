@@ -7,5 +7,6 @@ public interface IUserServicePort {
     Mono<UserModel> createUserAdminLogistic(UserModel userModel, String role);
 
     Mono<UserModel> createUserClient(UserModel userModel);
+    Mono<Void> changeUserPassword(String email, String oldPassword, String newPassword);
 
 }

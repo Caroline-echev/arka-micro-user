@@ -17,4 +17,9 @@ public class PasswordEncoderAdapter implements IPasswordEncoderPersistencePort {
         return Mono.fromCallable(() -> passwordEncoder.encode(password));
     }
 
+    @Override
+    public boolean matches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
 }

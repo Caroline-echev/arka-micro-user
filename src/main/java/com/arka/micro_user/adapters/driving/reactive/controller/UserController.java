@@ -1,5 +1,6 @@
 package com.arka.micro_user.adapters.driving.reactive.controller;
 
+import com.arka.micro_user.adapters.driving.reactive.dto.request.ChangePasswordRequest;
 import com.arka.micro_user.adapters.driving.reactive.dto.request.UserRequest;
 import com.arka.micro_user.adapters.driving.reactive.mapper.IUserDtoMapper;
 import com.arka.micro_user.domain.api.IUserServicePort;
@@ -33,5 +34,12 @@ public class UserController {
     public Mono<Void> createUserClient(@Valid @RequestBody UserRequest userRequest) {
         return userService.createUserClient(userMapper.toModel(userRequest)).then();
     }
+    @PostMapping("/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Change user password")
+    public Mono<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        return userService.changeUserPassword(request.getEmail(), request.getOldPassword(), request.getNewPassword());
+    }
+
 
 }
