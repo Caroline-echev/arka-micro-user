@@ -111,5 +111,34 @@ class UserUseCaseTest {
 
         verify(userPersistencePort).findByDni(dni);
     }
+    @Test
+    void createUserClient_Success() {
+        UserModel user = UserData.getAdminUser(); // reutilizamos admin para este test
+        RoleModel role = RoleData.getClientRole();
+
+        when(rolePersistencePort.getRoleByName(UserRole.CLIENT.name())).thenReturn(Mono.just(role));
+        when(userPersistencePort.findByEmail(user.getEmail())).thenReturn(Mono.empty());
+        when(userPersistencePort.findByDni(user.getDni())).thenReturn(Mono.empty());
+        when(passwordEncoderPersistencePort.encodePassword(user.getPassword())).thenReturn(Mono.just("hashed-password"));
+        when(userPersistencePort.saveUser(any(UserModel.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
+
+        StepVerifier.create(userUseCase.createUserClient(user))
+                .expectNextMatches(result -> result.getRoleId().equals(role.getId()) && result.getPassword().equals("hashed-password"))
+                .verifyComplete();
+
+        verify(userPersistencePort).saveUser(any(UserModel.class));
+    }
+
+    @Test
+    void createUserClient_RoleNotFound_ShouldThrowNotFoundException() {
+        UserModel user = UserData.getAdminUser(); // reuse user for test
+        when(rolePersistencePort.getRoleByName(UserRole.CLIENT.name())).thenReturn(Mono.empty());
+
+        StepVerifier.create(userUseCase.createUserClient(user))
+                .expectError(NotFoundException.class)
+                .verify();
+
+        verify(rolePersistencePort).getRoleByName(UserRole.CLIENT.name());
+    }
 
 }
