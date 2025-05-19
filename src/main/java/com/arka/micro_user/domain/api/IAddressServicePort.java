@@ -6,4 +6,6 @@ import reactor.core.publisher.Mono;
 public interface IAddressServicePort {
 
     Mono<Void> createAddress(AddressModel request, String dni);
+
+    Mono<Void> updateAddress(AddressModel request, String dni);
 }

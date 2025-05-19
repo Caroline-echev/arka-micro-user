@@ -4,7 +4,7 @@ public class AddressConstants {
     private AddressConstants() {
         throw new IllegalStateException("Utility class");
     }
-
+    public  static final String USER_DOES_NOT_HAVE_ADDRESS_EXCEPTION_MESSAGE = "User does not have an address to update.";
     public  static final String CUSTOMER_ALREADY_HAS_ADDRESS_EXCEPTION_MESSAGE = "The customer already has a registered address";
 
     public  static final String INVALID_ROLE_EXCEPTION_MESSAGE = "Only customers can register addresses";

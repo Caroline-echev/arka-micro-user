@@ -27,5 +27,12 @@ public class AddressController {
     public Mono<Void> createAddress(@Valid @RequestBody AddressRequest request, @PathVariable String dni) {
         return addressServicePort.createAddress(addressDtoMapper.toModel(request), dni);
     }
+    @PutMapping("/{dni}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update an existing address for a user")
+    public Mono<Void> updateAddress(@Valid @RequestBody AddressRequest request, @PathVariable String dni) {
+        return addressServicePort.updateAddress(addressDtoMapper.toModel(request), dni);
+    }
+
 }
 
