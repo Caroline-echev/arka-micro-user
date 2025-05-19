@@ -1,15 +1,17 @@
-    package com.arka.micro_user.domain.util;
+    package com.arka.micro_user.domain.util.validation;
 
     import com.arka.micro_user.domain.enums.UserRole;
     import com.arka.micro_user.domain.exception.BadRequestException;
     import com.arka.micro_user.domain.exception.DuplicateResourceException;
     import com.arka.micro_user.domain.exception.NotFoundException;
     import com.arka.micro_user.domain.model.RoleModel;
+    import com.arka.micro_user.domain.model.UserModel;
     import com.arka.micro_user.domain.spi.IRolePersistencePort;
     import com.arka.micro_user.domain.spi.IUserPersistencePort;
     import reactor.core.publisher.Mono;
 
-    import static com.arka.micro_user.domain.util.UserConstants.*;
+    import static com.arka.micro_user.domain.util.constants.AddressConstants.INVALID_ROLE_EXCEPTION_MESSAGE;
+    import static com.arka.micro_user.domain.util.constants.UserConstants.*;
 
     public class  UserValidationUtil{
 
@@ -40,4 +42,14 @@
                         return Mono.empty();
                     });
         }
+
+        public static Mono<Void> validateRoleClient(UserModel user, IRolePersistencePort rolePersistencePort) {
+            return rolePersistencePort.getRoleByName(UserRole.CLIENT.name())
+                    .filter(role -> role.getId().equals(user.getRoleId()))
+                    .switchIfEmpty(Mono.error(new BadRequestException(INVALID_ROLE_EXCEPTION_MESSAGE)))
+                    .then();
+        }
+
+
+
     }

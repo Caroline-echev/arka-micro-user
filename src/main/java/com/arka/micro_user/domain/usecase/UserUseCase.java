@@ -9,14 +9,14 @@ import com.arka.micro_user.domain.model.UserModel;
 import com.arka.micro_user.domain.spi.IPasswordEncoderPersistencePort;
 import com.arka.micro_user.domain.spi.IRolePersistencePort;
 import com.arka.micro_user.domain.spi.IUserPersistencePort;
-import com.arka.micro_user.domain.util.UserValidationUtil;
+import com.arka.micro_user.domain.util.validation.UserValidationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
-import static com.arka.micro_user.domain.util.UserConstants.*;
+import static com.arka.micro_user.domain.util.constants.UserConstants.*;
 
 
 @Service

@@ -11,7 +11,7 @@ import com.arka.micro_user.domain.model.UserModel;
 import com.arka.micro_user.domain.spi.IPasswordEncoderPersistencePort;
 import com.arka.micro_user.domain.spi.IRolePersistencePort;
 import com.arka.micro_user.domain.spi.IUserPersistencePort;
-import com.arka.micro_user.domain.util.UserValidationUtil;
+import com.arka.micro_user.domain.util.validation.UserValidationUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -20,8 +20,8 @@ import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static com.arka.micro_user.domain.util.UserConstants.USER_ALREADY_EXISTS_BY_DNI_EXCEPTION_MESSAGE;
-import static com.arka.micro_user.domain.util.UserConstants.USER_ALREADY_EXISTS_BY_EMAIL_EXCEPTION_MESSAGE;
+import static com.arka.micro_user.domain.util.constants.UserConstants.USER_ALREADY_EXISTS_BY_DNI_EXCEPTION_MESSAGE;
+import static com.arka.micro_user.domain.util.constants.UserConstants.USER_ALREADY_EXISTS_BY_EMAIL_EXCEPTION_MESSAGE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

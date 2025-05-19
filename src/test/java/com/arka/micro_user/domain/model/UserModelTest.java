@@ -4,7 +4,7 @@ import com.arka.micro_user.domain.exception.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static com.arka.micro_user.domain.util.UserConstants.*;
+import static com.arka.micro_user.domain.util.constants.UserConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserModelTest {

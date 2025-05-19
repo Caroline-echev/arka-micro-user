@@ -1,4 +1,4 @@
-package com.arka.micro_user.domain.util;
+package com.arka.micro_user.domain.util.constants;
 
 public class UserConstants {
 

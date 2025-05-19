@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
-import static com.arka.micro_user.domain.util.UserConstants.*;
+import static com.arka.micro_user.domain.util.constants.UserConstants.*;
 
 
 @Data
