@@ -8,11 +8,7 @@ public class ConstantsConfiguration {
 
 
     public static final String MIGRATE = "migrate";
-
-
-    public static final String API_TITLE = "Micro User API";
-    public static final String API_DESCRIPTION = "API for managing users";
-    public static final String API_VERSION = "v1.0";
-    public static final String API_GROUP = "users";
-    public static final String API_PATHS = "/api/**";
+    public static final Integer  DEFAULT_PAGE_SIZE = 7;
+    public static final String BEARER = "Bearer ";
+    public static final String ROLE_PREFIX = "ROLE_";
 }

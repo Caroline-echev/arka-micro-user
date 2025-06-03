@@ -1,4 +1,4 @@
-package com.arka.micro_user.adapters.driven.r2dbc.adapter;
+package com.arka.micro_user.adapters.driven.security.adapter;
 
 import com.arka.micro_user.domain.spi.IJwtPersistencePort;
 import io.jsonwebtoken.Claims;
@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -14,15 +15,19 @@ import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 
+import static com.arka.micro_user.adapters.driven.security.adapter.util.constants.SecurityAdapterConstants.*;
+
 @Slf4j
 @Component
 public class JwtAdapter implements IJwtPersistencePort {
 
+    @Value("${jwt.secret}")
+    private String base64Key;
     private final SecretKey secretKey;
-    private final Long expirationTime = 3600L;
+    @Value("${jwt.expiration.time}")
+    private  Long expirationTime ;
 
     public JwtAdapter() {
-        String base64Key = "buP42/1FeXMwHJBrL6bfAeHZG9y0SAzGowCVciVc7YxwMyra92GB7XSfW3tcb3CKSg07IFXQqFw7+vh/bzBPNQ==";
         this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
     }
 
@@ -34,8 +39,8 @@ public class JwtAdapter implements IJwtPersistencePort {
 
             return Jwts.builder()
                     .setSubject(userId)
-                    .claim("email", email)
-                    .claim("role", role)
+                    .claim(NAME_CLAIM_EMAIL, email)
+                    .claim(NAME_CLAIM_ROLE, role)
                     .setIssuedAt(now)
                     .setExpiration(expiryDate)
                     .signWith(secretKey, SignatureAlgorithm.HS512)
@@ -66,12 +71,12 @@ public class JwtAdapter implements IJwtPersistencePort {
 
     @Override
     public Mono<String> getEmailFromToken(String token) {
-        return Mono.fromCallable(() -> getClaims(token).get("email", String.class));
+        return Mono.fromCallable(() -> getClaims(token).get(NAME_CLAIM_EMAIL, String.class));
     }
 
     @Override
     public Mono<String> getRoleFromToken(String token) {
-        return Mono.fromCallable(() -> getClaims(token).get("role", String.class));
+        return Mono.fromCallable(() -> getClaims(token).get(NAME_CLAIM_ROLE, String.class));
     }
 
     @Override
@@ -79,7 +84,7 @@ public class JwtAdapter implements IJwtPersistencePort {
         return validateToken(token)
                 .flatMap(isValid -> {
                     if (!isValid) {
-                        return Mono.error(new JwtException("Token inválido"));
+                        return Mono.error(new JwtException(TOKEN_INVALID));
                     }
 
                     return getUserIdFromToken(token)

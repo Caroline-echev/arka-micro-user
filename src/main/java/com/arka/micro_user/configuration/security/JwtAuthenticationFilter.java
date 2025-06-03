@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.arka.micro_user.configuration.util.ConstantsConfiguration.*;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     private final IJwtPersistencePort jwtPersistencePort;
 
-    // Rutas que no requieren autenticación JWT
     private static final List<String> EXCLUDED_PATHS = Arrays.asList(
             "/api/auth/login",
             "/api/auth/refresh",
@@ -45,10 +46,10 @@ public class JwtAuthenticationFilter implements WebFilter {
             return chain.filter(exchange);
         }
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith(BEARER)) {
             return unauthorized(exchange);
         }
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(DEFAULT_PAGE_SIZE);
         return jwtPersistencePort.validateToken(token)
                 .flatMap(isValid -> {
                     if (isValid) {
@@ -86,7 +87,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             String email = tuple.getT2();
             String role = tuple.getT3();
 
-            String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+            String authority = role.startsWith(ROLE_PREFIX) ? role : ROLE_PREFIX + role;
             SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority);
 
             return new UsernamePasswordAuthenticationToken(

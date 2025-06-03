@@ -7,15 +7,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import static com.arka.micro_user.adapters.util.UserConstantsAdapter.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginRequest {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email format is invalid")
+
+    @NotBlank(message = EMAIL_REQUIRED)
+    @Email(message = EMAIL_INVALID)
     private String email;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = PASSWORD_REQUIRED)
     private String password;
 }

@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
+import static com.arka.micro_user.adapters.util.AuthConstantsAdapter.BEARER;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class AuthController {
         return authService.authenticate(authModel)
                 .map(token -> AuthResponse.builder()
                         .token(token)
-                        .type("Bearer")
+                        .type(BEARER)
                         .expiresIn(authService.getExpirationTime())
                         .build());
     }
@@ -45,7 +48,7 @@ public class AuthController {
         return authService.refreshToken(refreshRequest.getToken())
                 .map(newToken -> AuthResponse.builder()
                         .token(newToken)
-                        .type("Bearer")
+                        .type(BEARER)
                         .expiresIn(authService.getExpirationTime())
                         .build());
     }

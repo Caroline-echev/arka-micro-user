@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+import static com.arka.micro_user.domain.util.constants.AuthConstants.INVALID_CREDENTIALS;
+import static com.arka.micro_user.domain.util.constants.AuthConstants.ROLE_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 public class AuthUseCase implements IAuthServicePort {
@@ -26,7 +29,7 @@ public class AuthUseCase implements IAuthServicePort {
     @Override
     public Mono<String> authenticate(AuthenticationModel authModel) {
         return userPersistencePort.findByEmail(authModel.getEmail())
-                .switchIfEmpty(Mono.error(new NotFoundException("Credenciales inválidas")))
+                .switchIfEmpty(Mono.error(new NotFoundException(INVALID_CREDENTIALS)))
                 .flatMap(user -> {
                     boolean matches = passwordEncoderPersistencePort.matches(
                             authModel.getPassword(),
@@ -34,11 +37,11 @@ public class AuthUseCase implements IAuthServicePort {
                     );
 
                     if (!matches) {
-                        return Mono.error(new BadRequestException("Credenciales inválidas"));
+                        return Mono.error(new BadRequestException(INVALID_CREDENTIALS));
                     }
 
                     return rolePersistencePort.getRoleById(user.getRoleId())
-                            .switchIfEmpty(Mono.error(new NotFoundException("Role not found")))
+                            .switchIfEmpty(Mono.error(new NotFoundException(ROLE_NOT_FOUND)))
                             .flatMap(role ->
                                     jwtPersistencePort.generateToken(
                                             user.getId().toString(),
