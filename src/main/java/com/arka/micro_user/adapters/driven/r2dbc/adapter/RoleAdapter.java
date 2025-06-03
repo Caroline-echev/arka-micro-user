@@ -20,4 +20,11 @@ public class RoleAdapter implements IRolePersistencePort {
         return roleRepository.findByName(name)
                 .map(roleMapper::toModel);
     }
+
+    @Override
+    public Mono<RoleModel> getRoleById(Long id) {
+
+        return roleRepository.findById(id)
+                .map(roleMapper::toModel);
+    }
 }

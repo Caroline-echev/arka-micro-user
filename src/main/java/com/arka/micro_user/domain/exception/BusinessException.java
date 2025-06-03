@@ -1,6 +1,5 @@
 package com.arka.micro_user.domain.exception;
 
-import com.arka.micro_user.domain.exception.error.CommonErrorCode;
 import com.arka.micro_user.domain.exception.error.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -11,7 +11,7 @@ public class ConstantsConfiguration {
 
 
     public static final String API_TITLE = "Micro User API";
-    public static final String API_DESCRIPTION = "API para gestión de usuarios";
+    public static final String API_DESCRIPTION = "API for managing users";
     public static final String API_VERSION = "v1.0";
     public static final String API_GROUP = "users";
     public static final String API_PATHS = "/api/**";

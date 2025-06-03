@@ -6,4 +6,5 @@ import reactor.core.publisher.Mono;
 public interface IRolePersistencePort {
 
     Mono<RoleModel> getRoleByName(String name);
+    Mono<RoleModel> getRoleById (Long id);
 }
