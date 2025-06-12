@@ -21,16 +21,16 @@ import static com.arka.micro_user.adapters.driven.security.adapter.util.constant
 @Component
 public class JwtAdapter implements IJwtPersistencePort {
 
-    @Value("${jwt.secret}")
-    private String base64Key;
     private final SecretKey secretKey;
-    @Value("${jwt.expiration.time}")
-    private  Long expirationTime ;
+    private final Long expirationTime;
 
-    public JwtAdapter() {
+    public JwtAdapter(
+            @Value("${jwt.secret}") String base64Key,
+            @Value("${jwt.expiration-time}") Long expirationTime
+    ) {
         this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
+        this.expirationTime = expirationTime;
     }
-
     @Override
     public Mono<String> generateToken(String userId, String email, String role) {
         return Mono.fromCallable(() -> {
