@@ -8,5 +8,5 @@ public interface IUserServicePort {
 
     Mono<UserModel> createUserClient(UserModel userModel);
     Mono<Void> changeUserPassword(String email, String oldPassword, String newPassword);
-
+    Mono<Boolean> existsByIdAndValidRole (Long id, String role);
 }

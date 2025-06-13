@@ -28,7 +28,8 @@ public class SecurityConfig {
                                 "/favicon.ico",
                                 "/api/users/client",
                                 "/api/auth/**",
-                                "/api/users/change-password"
+                                "/api/users/change-password",
+                                "/api/users/exists/**"
                         ).permitAll()
                         .pathMatchers("/api/address/**").hasAuthority("ROLE_CLIENT")
                         .pathMatchers("/api/users/admin-logistic").hasAuthority("ROLE_ADMIN")

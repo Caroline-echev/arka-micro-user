@@ -41,5 +41,11 @@ public class UserController {
         return userService.changeUserPassword(request.getEmail(), request.getOldPassword(), request.getNewPassword());
     }
 
+    @GetMapping("/exists/{id}/{role}")
+    @Operation(summary = "Check if a user exists by id and role")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<Boolean> existsByIdAndValidRole(@PathVariable Long id, @PathVariable String role) {
+        return userService.existsByIdAndValidRole(id, role);
+    }
 
 }

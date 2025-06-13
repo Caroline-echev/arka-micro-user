@@ -78,6 +78,16 @@ public class UserUseCase implements IUserServicePort {
                 });
     }
 
+    @Override
+    public Mono<Boolean> existsByIdAndValidRole(Long id, String role) {
+        return userPersistencePort.findById(id)
+                .flatMap(user ->
+                        rolePersistencePort.getRoleById(user.getRoleId())
+                                .map(roleModel -> role.equals(roleModel.getName()))
+                );
+    }
+
+
 
     private Mono<UserModel> encodePassword(UserModel userModel) {
         return passwordEncoderPersistencePort.encodePassword(userModel.getPassword())
