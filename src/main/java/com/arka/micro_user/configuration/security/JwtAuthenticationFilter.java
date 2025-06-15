@@ -1,10 +1,11 @@
 package com.arka.micro_user.configuration.security;
 
 import com.arka.micro_user.domain.spi.IJwtPersistencePort;
+import com.arka.micro_user.domain.exception.BusinessException;
+import com.arka.micro_user.domain.exception.error.CommonErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -42,40 +43,63 @@ public class JwtAuthenticationFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+        log.debug("Incoming request on path: {}", path);
 
         if (isExcludedPath(path)) {
+            log.debug("Path excluded from JWT filter: {}", path);
             return chain.filter(exchange);
         }
+
         String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         if (authHeader == null || !authHeader.startsWith(BEARER)) {
-            return unauthorized(exchange);
+            log.warn("Missing or malformed Authorization header for path: {}", path);
+            return Mono.error(new BusinessException(
+                    CommonErrorCode.UNAUTHORIZED,
+                    "Authorization header is missing or malformed"
+            ));
         }
+
         String token = authHeader.substring(DEFAULT_PAGE_SIZE);
+        log.debug("Extracted JWT token: {}", token);
+
         return jwtPersistencePort.validateToken(token)
                 .flatMap(isValid -> {
                     if (isValid) {
+                        log.debug("Valid JWT token for path: {}", path);
                         return createSecurityContext(token)
+                                .doOnNext(auth -> log.info("Security context created for user: {}", auth.getPrincipal()))
                                 .flatMap(authentication ->
                                         chain.filter(exchange)
                                                 .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
                                 );
                     } else {
-                        return unauthorized(exchange);
+                        log.warn("Invalid JWT token received for path: {}", path);
+                        return Mono.error(new BusinessException(
+                                CommonErrorCode.UNAUTHORIZED,
+                                "Invalid or expired JWT token"
+                        ));
                     }
                 })
+                .onErrorResume(BusinessException.class, Mono::error)
                 .onErrorResume(error -> {
-                    log.error("Error validating token: {}", error.getMessage());
-                    return unauthorized(exchange);
+                    if (error instanceof BusinessException) {
+                        return Mono.error(error);
+                    }
+                    log.error("Unexpected error validating JWT token: {}", error.getMessage(), error);
+                    return Mono.error(new BusinessException(
+                            CommonErrorCode.UNAUTHORIZED,
+                            "Token validation failed: " + error.getMessage()
+                    ));
                 });
+
     }
 
     private boolean isExcludedPath(String path) {
-        return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
-    }
-
-    private Mono<Void> unauthorized(ServerWebExchange exchange) {
-        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-        return exchange.getResponse().setComplete();
+        boolean excluded = EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
+        if (excluded) {
+            log.trace("Path {} is excluded from JWT filter", path);
+        }
+        return excluded;
     }
 
     private Mono<UsernamePasswordAuthenticationToken> createSecurityContext(String token) {
@@ -87,6 +111,8 @@ public class JwtAuthenticationFilter implements WebFilter {
             String userId = tuple.getT1();
             String email = tuple.getT2();
             String role = tuple.getT3();
+
+            log.debug("Extracted data from token - userId: {}, email: {}, role: {}", userId, email, role);
 
             String authority = role.startsWith(ROLE_PREFIX) ? role : ROLE_PREFIX + role;
             SimpleGrantedAuthority grantedAuthority = new SimpleGrantedAuthority(authority);

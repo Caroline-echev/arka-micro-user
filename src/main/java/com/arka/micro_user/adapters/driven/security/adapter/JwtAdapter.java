@@ -31,13 +31,15 @@ public class JwtAdapter implements IJwtPersistencePort {
         this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(base64Key));
         this.expirationTime = expirationTime;
     }
+
     @Override
     public Mono<String> generateToken(String userId, String email, String role) {
+        log.info("Generating JWT token for userId: {}, email: {}, role: {}", userId, email, role);
         return Mono.fromCallable(() -> {
             Date now = new Date();
             Date expiryDate = new Date(now.getTime() + expirationTime * 1000);
 
-            return Jwts.builder()
+            String token = Jwts.builder()
                     .setSubject(userId)
                     .claim(NAME_CLAIM_EMAIL, email)
                     .claim(NAME_CLAIM_ROLE, role)
@@ -45,45 +47,66 @@ public class JwtAdapter implements IJwtPersistencePort {
                     .setExpiration(expiryDate)
                     .signWith(secretKey, SignatureAlgorithm.HS512)
                     .compact();
-        });
+
+            log.debug("Generated token: {}", token);
+            return token;
+        }).doOnError(e -> log.error("Error generating JWT token: {}", e.getMessage()));
     }
 
     @Override
     public Mono<Boolean> validateToken(String token) {
+        log.info("Validating JWT token");
         return Mono.fromCallable(() -> {
-            try {
-                Jwts.parserBuilder()
-                        .setSigningKey(secretKey)
-                        .build()
-                        .parseClaimsJws(token);
-                return true;
-            } catch (JwtException | IllegalArgumentException e) {
-                log.error("Invalid JWT token: {}", e.getMessage());
-                return false;
-            }
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+            log.info("Token is valid");
+            return true;
+        }).onErrorResume(e -> {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            return Mono.just(false);
         });
     }
 
+
     @Override
     public Mono<String> getUserIdFromToken(String token) {
-        return Mono.fromCallable(() -> getClaims(token).getSubject());
+        log.debug("Extracting userId from token");
+        return Mono.fromCallable(() -> {
+            String userId = getClaims(token).getSubject();
+            log.info("Extracted userId: {}", userId);
+            return userId;
+        }).doOnError(e -> log.error("Error extracting userId: {}", e.getMessage()));
     }
 
     @Override
     public Mono<String> getEmailFromToken(String token) {
-        return Mono.fromCallable(() -> getClaims(token).get(NAME_CLAIM_EMAIL, String.class));
+        log.debug("Extracting email from token");
+        return Mono.fromCallable(() -> {
+            String email = getClaims(token).get(NAME_CLAIM_EMAIL, String.class);
+            log.info("Extracted email: {}", email);
+            return email;
+        }).doOnError(e -> log.error("Error extracting email: {}", e.getMessage()));
     }
 
     @Override
     public Mono<String> getRoleFromToken(String token) {
-        return Mono.fromCallable(() -> getClaims(token).get(NAME_CLAIM_ROLE, String.class));
+        log.debug("Extracting role from token");
+        return Mono.fromCallable(() -> {
+            String role = getClaims(token).get(NAME_CLAIM_ROLE, String.class);
+            log.info("Extracted role: {}", role);
+            return role;
+        }).doOnError(e -> log.error("Error extracting role: {}", e.getMessage()));
     }
 
     @Override
     public Mono<String> refreshToken(String token) {
+        log.info("Refreshing JWT token");
         return validateToken(token)
                 .flatMap(isValid -> {
                     if (!isValid) {
+                        log.warn("Cannot refresh token: token is invalid");
                         return Mono.error(new JwtException(TOKEN_INVALID));
                     }
 
@@ -94,18 +117,20 @@ public class JwtAdapter implements IJwtPersistencePort {
                                 String userId = tuple.getT1().getT1();
                                 String email = tuple.getT1().getT2();
                                 String role = tuple.getT2();
-
+                                log.info("Generating refreshed token for userId: {}", userId);
                                 return generateToken(userId, email, role);
                             });
-                });
+                }).doOnError(e -> log.error("Error refreshing token: {}", e.getMessage()));
     }
 
     @Override
     public Long getExpirationTime() {
+        log.debug("Retrieving token expiration time: {} seconds", expirationTime);
         return expirationTime;
     }
 
     private Claims getClaims(String token) {
+        log.debug("Parsing claims from token");
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()

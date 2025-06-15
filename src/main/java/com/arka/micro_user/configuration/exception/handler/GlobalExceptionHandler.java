@@ -39,7 +39,7 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        log.error("Handling exception: {}", ex.getClass().getName(), ex);
+        log.error("Handling exception: {} - {}", ex.getClass().getName(), ex.getMessage(), ex);
 
         DataBufferFactory bufferFactory = exchange.getResponse().bufferFactory();
         exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
@@ -47,10 +47,15 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
         ErrorResponse errorResponse;
 
         if (ex instanceof BusinessException businessException) {
+            log.warn("Business exception captured - Code: {}, Message: {}",
+                    businessException.getCode(), businessException.getMessage());
+
             exchange.getResponse().setStatusCode(HttpStatus.valueOf(businessException.getStatusCode()));
             errorResponse = new ErrorResponse(businessException.getCode(), businessException.getMessage());
 
         } else if (ex instanceof WebExchangeBindException bindException) {
+            log.warn("Validation error in parameter binding");
+
             exchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
 
             Map<String, List<String>> fieldErrors = new HashMap<>();
@@ -70,9 +75,12 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
                     .details(Map.of(ERRORS, fieldErrors))
                     .build();
 
-            log.debug("Complete validation exception: {}", bindException.getMessage());
+            log.debug("Full details of validation exception: {}", bindException.getMessage());
 
         } else if (ex instanceof ResponseStatusException responseStatusException) {
+            log.warn("Captured ResponseStatusException - Code: {}, Reason: {}",
+                    responseStatusException.getStatusCode(), responseStatusException.getReason());
+
             exchange.getResponse().setStatusCode(responseStatusException.getStatusCode());
 
             String code = VALIDATION_ERROR_CODE + responseStatusException.getStatusCode().value();
@@ -82,6 +90,8 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
             errorResponse = new ErrorResponse(code, message);
 
         } else {
+            log.error("Unexpected exception: {}", ex.getMessage(), ex);
+
             exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
             ErrorCode errorCode = CommonErrorCode.INTERNAL_ERROR;
             errorResponse = new ErrorResponse(
@@ -92,10 +102,11 @@ public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
 
         DataBuffer dataBuffer;
         try {
-            log.debug("Error response: {}", objectMapper.writeValueAsString(errorResponse));
-            dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(errorResponse));
+            String responseAsJson = objectMapper.writeValueAsString(errorResponse);
+            log.debug("Serialized error response: {}", responseAsJson);
+            dataBuffer = bufferFactory.wrap(responseAsJson.getBytes());
         } catch (JsonProcessingException e) {
-            log.error(ERROR_WRITING_JSON, e);
+            log.error("Error serializing ErrorResponse", e);
             dataBuffer = bufferFactory.wrap(ERROR_PROCESSING_RESPONSE.getBytes());
         }
 

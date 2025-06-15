@@ -8,8 +8,8 @@ import lombok.Getter;
 public enum ErrorCategory {
     VALIDATION("Validation errors"),
     RESOURCE("Resource-related errors"),
-    SYSTEM("System errors");
-
+    SYSTEM("System errors"),
+    SECURITY("Security errors");
     private final String description;
 
 }
