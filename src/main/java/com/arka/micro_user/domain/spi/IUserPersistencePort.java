@@ -7,4 +7,5 @@ public interface IUserPersistencePort {
     Mono<UserModel> saveUser(UserModel user);
     Mono<UserModel> findByEmail(String email);
     Mono<UserModel> findByDni(String dni);
+    Mono<UserModel> findById(Long id);
 }

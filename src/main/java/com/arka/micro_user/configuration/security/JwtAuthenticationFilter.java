@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             "/api/auth/refresh",
             "/api/users/client",
             "/api/users/change-password",
-
+            "/api/users/exists/**",
             "/swagger-ui",
             "/v3/api-docs",
             "/api-docs",

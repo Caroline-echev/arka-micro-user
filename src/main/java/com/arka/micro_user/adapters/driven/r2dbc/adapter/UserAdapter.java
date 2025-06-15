@@ -31,4 +31,10 @@ public class UserAdapter implements IUserPersistencePort {
         return userRepository.findByDni(dni)
                 .map(userMapper::toModel);
     }
+
+    @Override
+    public Mono<UserModel> findById(Long id) {
+        return userRepository.findById(id)
+                .map(userMapper::toModel);
+    }
 }
