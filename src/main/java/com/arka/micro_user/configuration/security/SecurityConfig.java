@@ -29,7 +29,8 @@ public class SecurityConfig {
                                 "/api/users/client",
                                 "/api/auth/**",
                                 "/api/users/change-password",
-                                "/api/users/exists/**"
+                                "/api/users/exists/**",
+                                "/api/users/email/**"
                         ).permitAll()
                         .pathMatchers("/api/address/**").hasAuthority("ROLE_CLIENT")
                         .pathMatchers("/api/users/admin-logistic").hasAuthority("ROLE_ADMIN")

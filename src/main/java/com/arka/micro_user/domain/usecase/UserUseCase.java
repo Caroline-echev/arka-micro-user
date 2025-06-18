@@ -126,6 +126,16 @@ public class UserUseCase implements IUserServicePort {
                 );
     }
 
+    @Override
+    public Mono<UserModel> findByEmail(String email) {
+        log.info("Request to find user by email: {}", email);
+        return userPersistencePort.findByEmail(email)
+                .switchIfEmpty(Mono.defer(() -> {
+                    log.warn("User not found with email: {}", email);
+                    return Mono.error(new NotFoundException(USER_DOES_NOT_EXIST_EXCEPTION_MESSAGE + email));
+                }));
+    }
+
     private Mono<UserModel> encodePassword(UserModel userModel) {
         log.debug("Encoding password for user: {}", userModel.getEmail());
 

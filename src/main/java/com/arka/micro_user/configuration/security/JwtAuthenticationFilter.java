@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter implements WebFilter {
             "/api/users/client",
             "/api/users/change-password",
             "/api/users/exists/**",
+            "/api/users/email/**",
             "/swagger-ui",
             "/v3/api-docs",
             "/api-docs",

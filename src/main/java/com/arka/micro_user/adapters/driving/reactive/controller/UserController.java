@@ -2,6 +2,7 @@ package com.arka.micro_user.adapters.driving.reactive.controller;
 
 import com.arka.micro_user.adapters.driving.reactive.dto.request.ChangePasswordRequest;
 import com.arka.micro_user.adapters.driving.reactive.dto.request.UserRequest;
+import com.arka.micro_user.adapters.driving.reactive.dto.response.UserResponse;
 import com.arka.micro_user.adapters.driving.reactive.mapper.IUserDtoMapper;
 import com.arka.micro_user.domain.api.IUserServicePort;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,4 +49,10 @@ public class UserController {
         return userService.existsByIdAndValidRole(id, role);
     }
 
+    @GetMapping("/email/{email}")
+    @Operation(summary = "Get user by email")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<UserResponse> findByEmail(@PathVariable String email) {
+        return userService.findByEmail(email).map(userMapper::toResponse);
+    }
 }

@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: micro_user
+    ports:
+      - "8080:8080"
+    networks:
+      - arka_net
+
+networks:
+  arka_net:
